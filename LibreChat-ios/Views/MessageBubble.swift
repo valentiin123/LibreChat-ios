@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Textual
 
 struct MessageBubble: View {
     let message: UIMessage
@@ -22,13 +23,25 @@ struct MessageBubble: View {
                 )
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding()
+                .padding(.horizontal)
         } else {
-            Text(message.text.markdown)
+            StructuredText(markdown: message.text)
+                .padding(.horizontal)
         }
     }
 }
 
 #Preview {
-    MessageBubble(message: UIMessage(from: SDMessage(id: UUID(), role: "user", text: "je suis un test je suis un test je suis un test je suis un test", createdAt: .now , discussion: nil)))
+    List {
+        MessageBubble(message:
+            UIMessage(from: SDMessage(id: UUID(), role: "user", text: "je suis un test je suis un test je suis un test je suis un test", createdAt: .now, discussion: nil))
+        )
+        .listRowSeparator(.hidden)
+
+        MessageBubble(message:
+            UIMessage(from: SDMessage(id: UUID(), role: "assistant", text: "# Test", createdAt: .now, discussion: nil))
+        )
+        .listRowSeparator(.hidden)
+    }
+    .listStyle(.plain)
 }
