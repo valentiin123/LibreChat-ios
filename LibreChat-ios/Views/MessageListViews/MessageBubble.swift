@@ -15,7 +15,7 @@ struct MessageBubble: View {
 
     var body: some View {
         if isUser {
-            Text(message.text.markdown)
+            Text(message.text)
                 .padding()
                 .background(
                     AnyShapeStyle(.tint),

@@ -59,7 +59,7 @@ struct AddProviderSheet: View {
                 TextField("Name", text: $name)
             }
 
-            Section("Connection") {
+            Section {
                 if let existing = matchingProvider {
                     Button {
                         baseURLTemplate = existing.baseURL
@@ -87,6 +87,14 @@ struct AddProviderSheet: View {
                     .onChange(of: bearerToken) {
                         resetModels()
                     }
+            } header: {
+                Text("Connection")
+            } footer: {
+                if template == .custom && !isConnectionComplete {
+                    Text("The provider must support the OpenAI chat completions API format.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             if isConnectionComplete {
@@ -120,12 +128,6 @@ struct AddProviderSheet: View {
                             .foregroundStyle(.red)
                     }
                 }
-            }
-
-            Section {
-                Text("The provider must support the OpenAI chat completions API format.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
             }
         }
         .navigationTitle("Add \(template.name == "Custom Host" ? "Provider" : template.name)")
@@ -174,4 +176,8 @@ struct AddProviderSheet: View {
             isFetchingModels = false
         }
     }
+}
+
+#Preview {
+    AddProviderSheet(template: .custom)
 }
