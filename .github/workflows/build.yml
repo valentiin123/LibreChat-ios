@@ -10,17 +10,36 @@ jobs:
   build:
     name: Build LibreChat-ios
     runs-on: macos-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build
+      - name: Build and Archive
         run: |
-          xcodebuild clean build \
+          xcodebuild clean archive \
             -project "LibreChat-ios.xcodeproj" \
             -scheme "LibreChat-ios" \
-            -destination "generic/platform=iOS Simulator" \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath $PWD/build/LibreChat-ios.xcarchive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Package IPA
+        run: |
+          cd build
+          mkdir -p Payload
+          cp -R LibreChat-ios.xcarchive/Products/Applications/LibreChat-ios.app Payload/
+          zip -r LibreChat-ios.ipa Payload
+
+      - name: Create Release
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          files: build/LibreChat-ios.ipa
